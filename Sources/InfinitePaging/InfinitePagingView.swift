@@ -11,6 +11,7 @@ public protocol Pageable: Equatable & Identifiable {}
 
 public struct InfinitePagingView<T: Pageable, Content: View>: View {
     @Binding var objects: [T]
+    @State var swipeState: SwipeState = .ended
     let pageAlignment: PageAlignment
     let pagingHandler: (PageDirection) -> Void
     let content: (T) -> Content
@@ -41,6 +42,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
             .modifier(
                 InfinitePagingViewModifier(
                     objects: $objects,
+                    swipeState: $swipeState,
                     pageSize: Binding<CGFloat>(
                         get: { pageAlignment.scalar(proxy.size) },
                         set: { _ in }
@@ -49,6 +51,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
                     pagingHandler: pagingHandler
                 )
             )
+            .preference(key: SwipeStateKey.self, value: swipeState)
         }
         .clipped()
     }
@@ -68,6 +71,17 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
                 content(object)
                     .frame(width: size.width, height: size.height)
             }
+        }
+    }
+}
+
+public extension InfinitePagingView {
+    @ViewBuilder
+    func onSwipeStateChange(
+        _ action: @escaping (SwipeState) -> Void
+    ) -> some View {
+        onPreferenceChange(SwipeStateKey.self) {
+            action($0)
         }
     }
 }

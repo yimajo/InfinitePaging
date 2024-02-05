@@ -10,6 +10,7 @@ import SwiftUI
 struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     @Binding var objects: [T]
     @Binding var pageSize: CGFloat
+    @Binding var swipeState: SwipeState
     @State var pagingOffset: CGFloat
     @State var draggingOffset: CGFloat
     let pageAlignment: PageAlignment
@@ -18,9 +19,11 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
+                swipeState = .began
                 draggingOffset = pageAlignment.scalar(value.translation)
             }
             .onEnded { value in
+                swipeState = .ended
                 let oldIndex = Int(floor(0.5 - (pagingOffset / pageSize)))
                 pagingOffset += pageAlignment.scalar(value.translation)
                 draggingOffset = 0
@@ -56,11 +59,13 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
 
     init(
         objects: Binding<[T]>,
+        swipeState: Binding<SwipeState>,
         pageSize: Binding<CGFloat>,
         pageAlignment: PageAlignment,
         pagingHandler: @escaping (PageDirection) -> Void
     ) {
         _objects = objects
+        _swipeState = swipeState
         _pageSize = pageSize
         _pagingOffset = State(initialValue: -pageSize.wrappedValue)
         _draggingOffset = State(initialValue: 0)
