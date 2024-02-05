@@ -16,7 +16,7 @@ struct ContentView: View {
         Page(number: 1)
     ]
     @State var pageAlignment: PageAlignment = .horizontal
-
+    @State var isSwiping: Bool = false
     var body: some View {
         VStack {
             InfinitePagingView(
@@ -29,6 +29,12 @@ struct ContentView: View {
                     pageView(page)
                 }
             )
+            .onSwipeStateChange { state in
+                isSwiping = state == .began
+            }
+
+            Text("isSwiping: \(String(isSwiping))")
+
             Picker("Alignment", selection: $pageAlignment) {
                 ForEach(PageAlignment.allCases) { alignment in
                     Text(verbatim: alignment.label)
