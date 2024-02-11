@@ -61,7 +61,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         objects: Binding<[T]>,
         pageSize: Binding<CGFloat>,
         minimumDistance: CGFloat,
-        animation: Animation,
+        snappingAnimation: Animation,
         pageAlignment: PageAlignment,
         pagingHandler: @escaping (PageDirection) -> Void
     ) {
@@ -70,7 +70,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         _pagingOffset = State(initialValue: -pageSize.wrappedValue)
         _draggingOffset = State(initialValue: 0)
         self.minimumDistance = minimumDistance
-        self.snappingAnimation = animation
+        self.snappingAnimation = snappingAnimation
         self.pageAlignment = pageAlignment
         self.pagingHandler = pagingHandler
     }
