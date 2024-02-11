@@ -23,33 +23,42 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 draggingOffset = pageAlignment.scalar(value.translation)
             }
             .onEnded { value in
-                let oldIndex = Int(floor(0.5 - (pagingOffset / pageLength)))
                 pagingOffset += pageAlignment.scalar(value.translation)
                 draggingOffset = 0
-                let predicatedOffset = pageAlignment.scalar(value.predictedEndTranslation)
-                let newIndex = Int(max(0, min(2, round(1 - predicatedOffset / pageLength))))
+
+                let pageScroll = PageScroll(
+                    predicatedOffset: pageAlignment.scalar(value.predictedEndTranslation),
+                    pageLength: pageLength
+                )!
+
                 if #available(iOS 17.0, *) {
                     withAnimation(snappingAnimation) {
-                        pagingOffset = -pageLength * CGFloat(newIndex)
+                        pagingOffset = -pageLength * CGFloat(pageScroll.rawValue)
                     } completion: {
-                        if newIndex == oldIndex { return }
-                        if newIndex == 0 {
+                        switch pageScroll {
+                        case .leftToRightScroll:
                             pagingHandler(.backward)
-                        }
-                        if newIndex == 2 {
+
+                        case .smallScroll:
+                            break
+
+                        case .rightToLeftScroll:
                             pagingHandler(.forward)
                         }
                     }
                 } else {
                     withAnimation(snappingAnimation) {
-                        pagingOffset = -pageLength * CGFloat(newIndex)
+                        pagingOffset = -pageLength * CGFloat(pageScroll.rawValue)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if newIndex == oldIndex { return }
-                        if newIndex == 0 {
+                        switch pageScroll {
+                        case .leftToRightScroll:
                             pagingHandler(.backward)
-                        }
-                        if newIndex == 2 {
+
+                        case .smallScroll:
+                            break
+
+                        case .rightToLeftScroll:
                             pagingHandler(.forward)
                         }
                     }
