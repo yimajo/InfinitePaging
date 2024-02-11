@@ -35,8 +35,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                         if newIndex == oldIndex { return }
                         if newIndex == 0 {
                             pagingHandler(.backward)
-                        }
-                        if newIndex == 2 {
+                        } else if newIndex == 2 {
                             pagingHandler(.forward)
                         }
                     }
@@ -48,8 +47,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                         if newIndex == oldIndex { return }
                         if newIndex == 0 {
                             pagingHandler(.backward)
-                        }
-                        if newIndex == 2 {
+                        } else if newIndex == 2 {
                             pagingHandler(.forward)
                         }
                     }
