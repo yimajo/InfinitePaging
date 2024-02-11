@@ -13,6 +13,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     @State var pagingOffset: CGFloat
     @State var draggingOffset: CGFloat
     private let minimumDistance: CGFloat
+    private let snappingAnimation: Animation
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
 
@@ -28,7 +29,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 let predicatedOffset = pageAlignment.scalar(value.predictedEndTranslation)
                 let newIndex = Int(max(0, min(2, round(1 - predicatedOffset / pageSize))))
                 if #available(iOS 17.0, *) {
-                    withAnimation(.smooth(duration: 0.1)) {
+                    withAnimation(snappingAnimation) {
                         pagingOffset = -pageSize * CGFloat(newIndex)
                     } completion: {
                         if newIndex == oldIndex { return }
@@ -40,7 +41,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                         }
                     }
                 } else {
-                    withAnimation(.smooth(duration: 0.1)) {
+                    withAnimation(snappingAnimation) {
                         pagingOffset = -pageSize * CGFloat(newIndex)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -60,6 +61,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         objects: Binding<[T]>,
         pageSize: Binding<CGFloat>,
         minimumDistance: CGFloat,
+        animation: Animation,
         pageAlignment: PageAlignment,
         pagingHandler: @escaping (PageDirection) -> Void
     ) {
@@ -68,6 +70,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         _pagingOffset = State(initialValue: -pageSize.wrappedValue)
         _draggingOffset = State(initialValue: 0)
         self.minimumDistance = minimumDistance
+        self.snappingAnimation = animation
         self.pageAlignment = pageAlignment
         self.pagingHandler = pagingHandler
     }

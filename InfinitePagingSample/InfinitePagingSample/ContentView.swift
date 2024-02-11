@@ -22,6 +22,7 @@ struct ContentView: View {
             InfinitePagingView(
                 objects: $pages,
                 minimumDistance: 10,
+                snappingAnimation: .smooth(duration: 0.4),
                 pageAlignment: pageAlignment,
                 pagingHandler: { pageDirection in
                     paging(pageDirection)
