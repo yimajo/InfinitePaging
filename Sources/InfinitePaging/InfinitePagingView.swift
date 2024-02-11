@@ -47,7 +47,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
             .modifier(
                 InfinitePagingViewModifier(
                     objects: $objects,
-                    pageSize: Binding<CGFloat>(
+                    pageLength: Binding<CGFloat>(
                         get: { pageAlignment.scalar(proxy.size) },
                         set: { _ in }
                     ),
