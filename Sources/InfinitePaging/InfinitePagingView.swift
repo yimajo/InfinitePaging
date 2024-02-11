@@ -52,7 +52,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
                         set: { _ in }
                     ),
                     minimumDistance: minimumDistance,
-                    animation: snappingAnimation,
+                    snappingAnimation: snappingAnimation,
                     pageAlignment: pageAlignment,
                     pagingHandler: pagingHandler
                 )
