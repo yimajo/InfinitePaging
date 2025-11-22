@@ -11,6 +11,7 @@ public protocol Pageable: Equatable & Identifiable {}
 
 public struct InfinitePagingView<T: Pageable, Content: View>: View {
     @Binding var objects: [T]
+    @State var swipeState: SwipeState = .ended
     private let minimumDistance: CGFloat
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
@@ -50,9 +51,11 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
                     ),
                     minimumDistance: minimumDistance,
                     pageAlignment: pageAlignment,
-                    pagingHandler: pagingHandler
+                    pagingHandler: pagingHandler,
+                    swipeState: $swipeState,
                 )
             )
+            .preference(key: SwipeStateKey.self, value: swipeState)
         }
         .clipped()
         .id(pageAlignment)

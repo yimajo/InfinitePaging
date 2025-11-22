@@ -10,6 +10,7 @@ import SwiftUI
 struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     @Binding var objects: [T]
     @Binding var pageSize: CGFloat
+    @Binding var swipeState: SwipeState
     @State var pagingOffset: CGFloat
     @State var draggingOffset: CGFloat
     private let minimumDistance: CGFloat
@@ -19,6 +20,10 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
+                if swipeState != .began {
+                    swipeState = .began
+                }
+
                 draggingOffset = pageAlignment.scalar(value.translation)
             }
             .onEnded { value in
@@ -30,6 +35,9 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 withAnimation(.smooth(duration: 0.1)) {
                     pagingOffset = -pageSize * CGFloat(newIndex)
                 } completion: {
+                    defer {
+                        swipeState = .ended
+                    }
                     if newIndex == oldIndex { return }
                     if newIndex == 0 {
                         pagingHandler(.backward)
@@ -46,7 +54,8 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         pageSize: Binding<CGFloat>,
         minimumDistance: CGFloat,
         pageAlignment: PageAlignment,
-        pagingHandler: @escaping (PageDirection) -> Void
+        pagingHandler: @escaping (PageDirection) -> Void,
+        swipeState: Binding<SwipeState>
     ) {
         _objects = objects
         _pageSize = pageSize
@@ -55,6 +64,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         self.minimumDistance = minimumDistance
         self.pageAlignment = pageAlignment
         self.pagingHandler = pagingHandler
+        _swipeState = swipeState
     }
 
     func body(content: Content) -> some View {
