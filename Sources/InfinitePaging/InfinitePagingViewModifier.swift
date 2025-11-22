@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
+    @Environment(\.pagingDisabled) private var isPagingDisabled: Bool
     @Binding var objects: [T]
     @Binding var pageSize: CGFloat
     @Binding var swipeState: SwipeState
@@ -20,13 +21,34 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
-                if swipeState != .began {
+                guard !isPagingDisabled else {
+                    draggingOffset = 0
+                    if swipeState != .ended {
+                        swipeState = .ended
+                    }
+                    return
+                }
+
+                let mainScalar = pageAlignment.scalar(value.translation)
+                if swipeState == .ended {
+                    let crossScalar = pageAlignment.crossScalar(
+                        value.translation
+                    )
+
+                    guard abs(crossScalar) <= abs(mainScalar) * 2 else {
+                        return
+                    }
                     swipeState = .began
                 }
 
-                draggingOffset = pageAlignment.scalar(value.translation)
+                draggingOffset = mainScalar
             }
             .onEnded { value in
+                guard !isPagingDisabled else {
+                    draggingOffset = 0
+                    swipeState = .ended
+                    return
+                }
                 let oldIndex = Int(floor(0.5 - (pagingOffset / pageSize)))
                 pagingOffset += pageAlignment.scalar(value.translation)
                 draggingOffset = 0
