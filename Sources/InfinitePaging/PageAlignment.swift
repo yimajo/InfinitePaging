@@ -28,4 +28,14 @@ public enum PageAlignment: String, CaseIterable {
             CGSize(width: 0, height: value)
         }
     }
+
+    // Returns the movement amount in the direction perpendicular to the main axis
+    func crossScalar(_ translation: CGSize) -> CGFloat {
+        switch self {
+        case .horizontal:
+            return translation.height
+        case .vertical:
+            return translation.width
+        }
+    }
 }
