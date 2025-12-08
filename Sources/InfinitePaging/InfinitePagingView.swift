@@ -57,7 +57,6 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
                     swipeState: $swipeState,
                 )
             )
-            .preference(key: SwipeStateKey.self, value: swipeState)
         }
         .clipped()
         .id(pageAlignment)
