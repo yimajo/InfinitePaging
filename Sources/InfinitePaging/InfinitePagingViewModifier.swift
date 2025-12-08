@@ -99,5 +99,13 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
             .onChange(of: pageSize) { _, _ in
                 pagingOffset = -pageSize
             }
+            .onChange(of: swipeState) { oldState, newState in
+                guard newState == .ended, draggingOffset != 0 else {
+                    return
+                }
+                withAnimation(.interactiveSpring) {
+                    draggingOffset = 0
+                }
+            }
     }
 }
