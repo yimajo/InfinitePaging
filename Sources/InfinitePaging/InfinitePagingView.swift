@@ -11,7 +11,7 @@ public protocol Pageable: Equatable & Identifiable {}
 
 public struct InfinitePagingView<T: Pageable, Content: View>: View {
     @Binding var objects: [T]
-    @State var swipeState: SwipeState = .ended
+    @Binding private var swipeState: SwipeState
     private let minimumDistance: CGFloat
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
@@ -19,6 +19,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
 
     public init(
         objects: Binding<[T]>,
+        swipeState: Binding<SwipeState>,
         minimumDistance: CGFloat = 0,
         pageAlignment: PageAlignment,
         pagingHandler: @escaping (PageDirection) -> Void,
@@ -26,6 +27,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
     ) {
         assert(objects.wrappedValue.count == 3, "objects count must be 3.")
         _objects = objects
+        _swipeState = swipeState
         self.minimumDistance = minimumDistance
         self.pageAlignment = pageAlignment
         self.pagingHandler = pagingHandler
