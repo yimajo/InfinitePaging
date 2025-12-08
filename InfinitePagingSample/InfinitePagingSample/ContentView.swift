@@ -16,13 +16,14 @@ struct ContentView: View {
         Page(number: 1)
     ]
     @State var pageAlignment: PageAlignment = .horizontal
-    @State var isPaging: Bool = false
+    @State var swipeState: SwipeState = .ended
     @State private var isScrollViewDragging: Bool = false
 
     var body: some View {
         VStack {
             InfinitePagingView(
                 objects: $pages,
+                swipeState: $swipeState,
                 minimumDistance: 10,
                 pageAlignment: pageAlignment,
                 pagingHandler: { paging($0) },
@@ -32,8 +33,8 @@ struct ContentView: View {
                             pageView(page)
                                 .frame(height: 500)
                         }
-                        .scrollDisabled(isPaging)
-                        .allowsHitTesting(!isPaging)
+                        .scrollDisabled(swipeState == .began)
+                        .allowsHitTesting(swipeState == .ended)
                         .onScrollPhaseChange { _, phase in
                             switch phase {
                             case .idle:
@@ -46,11 +47,8 @@ struct ContentView: View {
                 }
             )
             .pagingDisabled(isScrollViewDragging)
-            .onSwipeStateChange { state in
-                isPaging = (state == .began)
-            }
 
-            Text("isPaging: \(String(isPaging))")
+            Text("isPaging: \(String(swipeState == .began))")
 
             Picker("Alignment", selection: $pageAlignment) {
                 ForEach(PageAlignment.allCases) { alignment in
