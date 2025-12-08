@@ -37,10 +37,13 @@ struct ContentView: View {
         Page(number: 0),
         Page(number: 1)
     ]
+    // You can cancel the state by setting it to .ended.
+    @State var swipeState: SwipeState = .ended
 
     var body: some View {
         InfinitePagingView(
             objects: $pages,
+            swipeState: $swipeState,
             pageAlignment: .horizontal,
             pagingHandler: { paging($0) },
             content: { pageView($0) }
