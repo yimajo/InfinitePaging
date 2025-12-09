@@ -33,9 +33,9 @@ public enum PageAlignment: String, CaseIterable {
     func crossScalar(_ translation: CGSize) -> CGFloat {
         switch self {
         case .horizontal:
-            return translation.height
+            translation.height
         case .vertical:
-            return translation.width
+            translation.width
         }
     }
 }
