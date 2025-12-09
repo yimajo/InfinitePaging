@@ -33,6 +33,10 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         }
     }
 
+    private func centerPagingOffset(to index: Int = 0) {
+        pagingOffset = -pageSize * CGFloat(index)
+    }
+
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
@@ -75,7 +79,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 }()
 
                 withAnimation(.smooth(duration: 0.1)) {
-                    pagingOffset = -pageSize * CGFloat(newIndex)
+                    centerPagingOffset(to: newIndex)
                 } completion: {
                     defer {
                         endDragging()
@@ -116,10 +120,10 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
             .offset(pageAlignment.offset(pagingOffset + draggingOffset))
             .simultaneousGesture(dragGesture)
             .onChange(of: objects) { _, _ in
-                pagingOffset = -pageSize
+                centerPagingOffset()
             }
             .onChange(of: pageSize) { _, _ in
-                pagingOffset = -pageSize
+                centerPagingOffset()
             }
             .onChange(of: swipeState) { oldState, newState in
                 guard newState == .ended, draggingOffset != 0 else {
