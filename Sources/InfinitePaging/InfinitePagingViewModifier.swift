@@ -41,6 +41,13 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         Int(floor(0.5 - offset / pageSize))
     }
 
+    private func predictedPageIndex(
+      from predictedOffset: CGFloat
+    ) -> Int {
+        let index = Int((1 - predictedOffset / pageSize).rounded())
+        return max(0, min(2, index))
+    }
+
     private func canStartSwipe(
         mainScalar: CGFloat,
         crossScalar: CGFloat
@@ -82,15 +89,11 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 let oldIndex = currentPageIndex(from: pagingOffset)
                 pagingOffset += pageAlignment.scalar(value.translation)
                 draggingOffset = 0
-                let newIndex = {
-                    let predicatedOffset = pageAlignment.scalar(
-                        value.predictedEndTranslation
-                    )
-                    let predictedPageIndex = Int(
-                        (1 - predicatedOffset / pageSize).rounded()
-                    )
-                    return max(0, min(2, predictedPageIndex))
-                }()
+                let newIndex = predictedPageIndex(
+                  from: pageAlignment.scalar(
+                      value.predictedEndTranslation
+                  )
+                )
 
                 withAnimation(.smooth(duration: 0.1)) {
                     centerPagingOffset(to: newIndex)
