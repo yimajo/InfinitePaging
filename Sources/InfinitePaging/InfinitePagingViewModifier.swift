@@ -45,7 +45,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         mainScalar: CGFloat,
         crossScalar: CGFloat
     ) -> Bool {
-        return abs(crossScalar) <= abs(mainScalar) * 2
+        abs(crossScalar) <= abs(mainScalar) * 2
     }
 
     private var dragGesture: some Gesture {
