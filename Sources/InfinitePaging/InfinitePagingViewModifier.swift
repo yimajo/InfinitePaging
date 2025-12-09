@@ -18,7 +18,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
 
-    var dragGesture: some Gesture {
+    private var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
                 guard !isPagingDisabled else {
