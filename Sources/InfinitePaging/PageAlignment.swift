@@ -15,6 +15,7 @@ public enum PageAlignment: String, CaseIterable {
         switch self {
         case .horizontal:
             size.width
+
         case .vertical:
             size.height
         }
@@ -24,6 +25,7 @@ public enum PageAlignment: String, CaseIterable {
         switch self {
         case .horizontal: 
             CGSize(width: value, height: 0)
+
         case .vertical:
             CGSize(width: 0, height: value)
         }
@@ -34,6 +36,7 @@ public enum PageAlignment: String, CaseIterable {
         switch self {
         case .horizontal:
             translation.height
+
         case .vertical:
             translation.width
         }
