@@ -78,7 +78,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                     pagingOffset = -pageSize * CGFloat(newIndex)
                 } completion: {
                     defer {
-                        swipeState = .ended
+                        endDragging()
                     }
 
                     guard newIndex != oldIndex else { return }
