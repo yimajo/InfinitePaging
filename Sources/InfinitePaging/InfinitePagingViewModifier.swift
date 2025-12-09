@@ -18,14 +18,26 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
 
+    private func endDragging(animation: Animation? = nil) {
+        let setDragEndedState = {
+            draggingOffset = 0
+            swipeState = .ended
+        }
+
+        if let animation {
+            withAnimation(animation) {
+                setDragEndedState()
+            }
+        } else {
+            setDragEndedState()
+        }
+    }
+
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
                 guard !isPagingDisabled else {
-                    draggingOffset = 0
-                    if swipeState != .ended {
-                        swipeState = .ended
-                    }
+                    endDragging()
                     return
                 }
 
@@ -45,8 +57,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
             }
             .onEnded { value in
                 guard !isPagingDisabled else {
-                    draggingOffset = 0
-                    swipeState = .ended
+                    endDragging()
                     return
                 }
                 let oldIndex = Int(floor(0.5 - (pagingOffset / pageSize)))
@@ -103,9 +114,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 guard newState == .ended, draggingOffset != 0 else {
                     return
                 }
-                withAnimation(.interactiveSpring) {
-                    draggingOffset = 0
-                }
+                endDragging(animation: .interactiveSpring)
             }
     }
 }
