@@ -37,6 +37,13 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         pagingOffset = -pageSize * CGFloat(index)
     }
 
+    private func canStartSwipe(
+        mainScalar: CGFloat,
+        crossScalar: CGFloat
+    ) -> Bool {
+        return abs(crossScalar) <= abs(mainScalar) * 2
+    }
+
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
@@ -45,13 +52,16 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                     return
                 }
 
-                let mainScalar = pageAlignment.scalar(value.translation)
+                let mainScalar = pageAlignment.scalar(
+                  value.translation
+                )
                 if swipeState == .ended {
-                    let crossScalar = pageAlignment.crossScalar(
+                    guard canStartSwipe(
+                      mainScalar: mainScalar,
+                      crossScalar: pageAlignment.crossScalar(
                         value.translation
-                    )
-
-                    guard abs(crossScalar) <= abs(mainScalar) * 2 else {
+                      )
+                    ) else {
                         return
                     }
                     swipeState = .began
