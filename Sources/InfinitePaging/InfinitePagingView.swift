@@ -10,7 +10,7 @@ import SwiftUI
 public protocol Pageable: Equatable & Identifiable {}
 
 public struct InfinitePagingView<T: Pageable, Content: View>: View {
-    @Binding var objects: [T]
+    @Binding private var objects: [T]
     @Binding private var swipeState: SwipeState
     private let minimumDistance: CGFloat
     private let pageAlignment: PageAlignment
