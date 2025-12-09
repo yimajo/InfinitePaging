@@ -42,7 +42,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     }
 
     private func predictedPageIndex(
-      from predictedOffset: CGFloat
+        from predictedOffset: CGFloat
     ) -> Int {
         let index = Int((1 - predictedOffset / pageSize).rounded())
         return max(0, min(2, index))
