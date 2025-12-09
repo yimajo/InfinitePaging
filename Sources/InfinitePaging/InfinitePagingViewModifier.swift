@@ -80,7 +80,9 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                     defer {
                         swipeState = .ended
                     }
-                    if newIndex == oldIndex { return }
+
+                    guard newIndex != oldIndex else { return }
+
                     if newIndex == 0 {
                         pagingHandler(.backward)
                     }
