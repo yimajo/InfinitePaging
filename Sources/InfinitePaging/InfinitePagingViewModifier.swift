@@ -64,14 +64,14 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 }
 
                 let mainScalar = pageAlignment.scalar(
-                  value.translation
+                    value.translation
                 )
                 if swipeState == .ended {
                     guard canStartSwipe(
-                      mainScalar: mainScalar,
-                      crossScalar: pageAlignment.crossScalar(
-                        value.translation
-                      )
+                        mainScalar: mainScalar,
+                        crossScalar: pageAlignment.crossScalar(
+                            value.translation
+                        )
                     ) else {
                         return
                     }
@@ -90,9 +90,9 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
                 pagingOffset += pageAlignment.scalar(value.translation)
                 draggingOffset = 0
                 let newIndex = predictedPageIndex(
-                  from: pageAlignment.scalar(
-                      value.predictedEndTranslation
-                  )
+                    from: pageAlignment.scalar(
+                        value.predictedEndTranslation
+                    )
                 )
 
                 withAnimation(.smooth(duration: 0.1)) {
