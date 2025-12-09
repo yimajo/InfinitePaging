@@ -9,11 +9,11 @@ import SwiftUI
 
 struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     @Environment(\.pagingDisabled) private var isPagingDisabled: Bool
-    @Binding var objects: [T]
-    @Binding var pageSize: CGFloat
-    @Binding var swipeState: SwipeState
-    @State var pagingOffset: CGFloat
-    @State var draggingOffset: CGFloat
+    @Binding private var objects: [T]
+    @Binding private var pageSize: CGFloat
+    @Binding private var swipeState: SwipeState
+    @State private var pagingOffset: CGFloat
+    @State private var draggingOffset: CGFloat
     private let minimumDistance: CGFloat
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
