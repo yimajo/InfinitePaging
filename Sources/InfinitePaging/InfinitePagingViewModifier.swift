@@ -18,24 +18,61 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
     private let pageAlignment: PageAlignment
     private let pagingHandler: (PageDirection) -> Void
 
-    var dragGesture: some Gesture {
+    private func endDragging(animation: Animation? = nil) {
+        let setDragEndedState = {
+            draggingOffset = 0
+            swipeState = .ended
+        }
+
+        if let animation {
+            withAnimation(animation) {
+                setDragEndedState()
+            }
+        } else {
+            setDragEndedState()
+        }
+    }
+
+    private func centerPagingOffset(to index: Int = 1) {
+        pagingOffset = -pageSize * CGFloat(index)
+    }
+
+    private func currentPageIndex(from offset: CGFloat) -> Int {
+        Int(floor(0.5 - offset / pageSize))
+    }
+
+    private func predictedPageIndex(
+        from predictedOffset: CGFloat
+    ) -> Int {
+        let index = Int((1 - predictedOffset / pageSize).rounded())
+        return max(0, min(2, index))
+    }
+
+    private func canStartSwipe(
+        mainScalar: CGFloat,
+        crossScalar: CGFloat
+    ) -> Bool {
+        abs(crossScalar) <= abs(mainScalar) * 2
+    }
+
+    private var dragGesture: some Gesture {
         DragGesture(minimumDistance: minimumDistance)
             .onChanged { value in
                 guard !isPagingDisabled else {
-                    draggingOffset = 0
-                    if swipeState != .ended {
-                        swipeState = .ended
-                    }
+                    endDragging()
                     return
                 }
 
-                let mainScalar = pageAlignment.scalar(value.translation)
+                let mainScalar = pageAlignment.scalar(
+                    value.translation
+                )
                 if swipeState == .ended {
-                    let crossScalar = pageAlignment.crossScalar(
-                        value.translation
-                    )
-
-                    guard abs(crossScalar) <= abs(mainScalar) * 2 else {
+                    guard canStartSwipe(
+                        mainScalar: mainScalar,
+                        crossScalar: pageAlignment.crossScalar(
+                            value.translation
+                        )
+                    ) else {
                         return
                     }
                     swipeState = .began
@@ -45,22 +82,28 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
             }
             .onEnded { value in
                 guard !isPagingDisabled else {
-                    draggingOffset = 0
-                    swipeState = .ended
+                    endDragging()
                     return
                 }
-                let oldIndex = Int(floor(0.5 - (pagingOffset / pageSize)))
+
+                let oldIndex = currentPageIndex(from: pagingOffset)
                 pagingOffset += pageAlignment.scalar(value.translation)
                 draggingOffset = 0
-                let predicatedOffset = pageAlignment.scalar(value.predictedEndTranslation)
-                let newIndex = Int(max(0, min(2, round(1 - predicatedOffset / pageSize))))
+                let newIndex = predictedPageIndex(
+                    from: pageAlignment.scalar(
+                        value.predictedEndTranslation
+                    )
+                )
+
                 withAnimation(.smooth(duration: 0.1)) {
-                    pagingOffset = -pageSize * CGFloat(newIndex)
+                    centerPagingOffset(to: newIndex)
                 } completion: {
                     defer {
-                        swipeState = .ended
+                        endDragging()
                     }
-                    if newIndex == oldIndex { return }
+
+                    guard newIndex != oldIndex else { return }
+
                     if newIndex == 0 {
                         pagingHandler(.backward)
                     }
@@ -94,18 +137,16 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
             .offset(pageAlignment.offset(pagingOffset + draggingOffset))
             .simultaneousGesture(dragGesture)
             .onChange(of: objects) { _, _ in
-                pagingOffset = -pageSize
+                centerPagingOffset()
             }
             .onChange(of: pageSize) { _, _ in
-                pagingOffset = -pageSize
+                centerPagingOffset()
             }
             .onChange(of: swipeState) { oldState, newState in
                 guard newState == .ended, draggingOffset != 0 else {
                     return
                 }
-                withAnimation(.interactiveSpring) {
-                    draggingOffset = 0
-                }
+                endDragging(animation: .interactiveSpring)
             }
     }
 }

@@ -40,6 +40,7 @@ public struct InfinitePagingView<T: Pageable, Content: View>: View {
                 switch pageAlignment {
                 case .horizontal:
                     horizontalView(size: proxy.size)
+
                 case .vertical:
                     verticalView(size: proxy.size)
                 }
