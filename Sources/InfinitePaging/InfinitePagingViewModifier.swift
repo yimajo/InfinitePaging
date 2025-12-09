@@ -33,7 +33,7 @@ struct InfinitePagingViewModifier<T: Pageable>: ViewModifier {
         }
     }
 
-    private func centerPagingOffset(to index: Int = 0) {
+    private func centerPagingOffset(to index: Int = 1) {
         pagingOffset = -pageSize * CGFloat(index)
     }
 
